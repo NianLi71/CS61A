@@ -10,9 +10,9 @@ def a_plus_abs_b(a, b):
     5
     """
     if b < 0:
-        f = _____
+        f = lambda a, b: a - b
     else:
-        f = _____
+        f = lambda a, b: a + b
     return f(a, b)
 
 
@@ -40,7 +40,7 @@ def two_of_three(x, y, z):
     >>> two_of_three(5, 5, 5)
     50
     """
-    return _____
+    return min(x, y)**2 + min(max(x, y), z)**2
 
 
 def two_of_three_syntax_check():
@@ -66,11 +66,13 @@ def largest_factor(n):
     """
     "*** YOUR CODE HERE ***"
 
+    return [factor for factor in range(1, n//2+1) if n % factor == 0][-1]
 
-def limited(x, z, limit):
+
+def limited(x, f, limit):
     """Logic that is common to invert and change."""
     if x != 0:
-        return min(z, limit)
+        return min(f(x), limit)
     else:
         return limit
 
@@ -90,7 +92,7 @@ def invert_short(x, limit):
     >>> invert_short(x, 100)  # No error, even though 1/x divides by 0!
     100
     """
-    return limited(x, 1 / x, limit)
+    return limited(x, lambda x: 1 / x, limit)
 
 
 def change_short(x, y, limit):
@@ -108,7 +110,10 @@ def change_short(x, y, limit):
     >>> change_short(x, y, 100)  # No error, even though abs(y - x) / x divides by 0!
     100
     """
-    return limited(x, abs(y - x) / x, limit)
+
+    # pass function as parameter to delay the calculation after "if x != 0" check
+    # also note here use function closure to reserve y value
+    return limited(x, lambda x: abs(y - x) / x, limit)
 
 
 def invert_and_change_syntax_check():
@@ -141,10 +146,40 @@ def hailstone(n):
     """
     "*** YOUR CODE HERE ***"
 
+    item, step = n, 1
+    while True:
+        print(item)
+        if (item == 1):
+            break
+        elif item % 2 == 0:
+            item //= 2
+        else:
+            item = item * 3 + 1
+        step += 1
+    
+    return step
+
 
 "*** YOUR CODE HERE ***"
-quine = ''
+quine = "a='a=%r;print(a%%a)';print(a%a)\n"
 
+'''
+Some notes:
+1. 
+In [36]: print('%r, a%%a'%'a')
+'a', a%a
+
+2. Old string format
+https://docs.python.org/3/tutorial/inputoutput.html#old-string-formatting
+>>> import math
+>>> print('The value of pi is approximately %5.3f.' % math.pi)
+The value of pi is approximately 3.142.
+
+3. don't forget '\n' at the end or will get error:
+Not a quine :(
+Code was:   "a='a=%r;print(a%%a)';print(a%a)"
+Output was: "a='a=%r;print(a%%a)';print(a%a)\n"
+'''
 
 def quine_test():
     """
