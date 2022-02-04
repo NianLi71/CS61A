@@ -1,0 +1,237 @@
+from operator import add, mul
+import re
+from sched import scheduler
+
+square = lambda x: x * x
+
+identity = lambda x: x
+
+triple = lambda x: 3 * x
+
+increment = lambda x: x + 1
+
+
+HW_SOURCE_FILE = __file__
+
+
+def product(n, term):
+    """Return the product of the first n terms in a sequence.
+
+    n: a positive integer
+    term:  a function that takes one argument to produce the term
+
+    >>> product(3, identity)  # 1 * 2 * 3
+    6
+    >>> product(5, identity)  # 1 * 2 * 3 * 4 * 5
+    120
+    >>> product(3, square)    # 1^2 * 2^2 * 3^2
+    36
+    >>> product(5, square)    # 1^2 * 2^2 * 3^2 * 4^2 * 5^2
+    14400
+    >>> product(3, increment) # (1+1) * (2+1) * (3+1)
+    24
+    >>> product(3, triple)    # 1*3 * 2*3 * 3*3
+    162
+    """
+    "*** YOUR CODE HERE ***"
+
+    product = 1
+    for i in range(1, n+1):
+        product *= term(i)
+    return product
+
+
+def square(x):
+    return x * x
+
+
+def accumulate(merger, base, n, term):
+    """Return the result of merging the first n terms in a sequence and base.
+    The terms to be merged are term(1), term(2), ..., term(n). merger is a
+    two-argument commutative function.
+
+    >>> accumulate(add, 0, 5, identity)  # 0 + 1 + 2 + 3 + 4 + 5
+    15
+    >>> accumulate(add, 11, 5, identity) # 11 + 1 + 2 + 3 + 4 + 5
+    26
+    >>> accumulate(add, 11, 0, identity) # 11
+    11
+    >>> accumulate(add, 11, 3, square)   # 11 + 1^2 + 2^2 + 3^2
+    25
+    >>> accumulate(mul, 2, 3, square)    # 2 * 1^2 * 2^2 * 3^2
+    72
+    >>> # 2 + (1^2 + 1) + (2^2 + 1) + (3^2 + 1)
+    >>> accumulate(lambda x, y: x + y + 1, 2, 3, square)
+    19
+    >>> # ((2 * 1^2 * 2) * 2^2 * 2) * 3^2 * 2
+    >>> accumulate(lambda x, y: 2 * x * y, 2, 3, square)
+    576
+    >>> accumulate(lambda x, y: (x + y) % 17, 19, 20, square)
+    16
+    """
+    "*** YOUR CODE HERE ***"
+    
+    accu = base
+    for i in range(1, n + 1):
+        accu = merger(accu, term(i))
+    return accu
+
+
+def summation_using_accumulate(n, term):
+    """Returns the sum: term(1) + ... + term(n), using accumulate.
+
+    >>> summation_using_accumulate(5, square)
+    55
+    >>> summation_using_accumulate(5, triple)
+    45
+    """
+    "*** YOUR CODE HERE ***"
+    return accumulate(lambda x, y: x + y, 0, n, term)
+
+
+def product_using_accumulate(n, term):
+    """Returns the product: term(1) * ... * term(n), using accumulate.
+
+    >>> product_using_accumulate(4, square)
+    576
+    >>> product_using_accumulate(6, triple)
+    524880
+    """
+    "*** YOUR CODE HERE ***"
+    return accumulate(lambda x, y: x * y, 1, n, term)
+
+
+def accumulate_syntax_check():
+    """Checks that definitions of summation_using_accumulate and
+    produce_using_accumulate are each a single return statement.
+
+    >>> # You aren't expected to understand the code of this test.
+    >>> # Check that the bodies of the functions are just return statements.
+    >>> # If this errors, make sure you have removed the "***YOUR CODE HERE***".
+    >>> import inspect, ast
+    >>> [type(x).__name__ for x in ast.parse(inspect.getsource(summation_using_accumulate)).body[0].body]
+    ['Expr', 'Return']
+    >>> [type(x).__name__ for x in ast.parse(inspect.getsource(product_using_accumulate)).body[0].body]
+    ['Expr', 'Return']
+    """
+
+
+def zero(f):
+    return lambda x: x
+
+
+def zero_expend(f):
+    def xF(x):
+        return x
+    return xF
+
+
+def successor(n):
+    return lambda f: lambda x: f(n(f)(x))
+
+def successor_expend(n):
+    '''
+    zero(f) = x:x
+    one(f) = successor(zero) -> x:f(zero(f)(x)) -> x:f(x)
+    two(f) = successor(one) -> x:f(one(f)(x)) ->  x:f(f(x))
+    three(f) = x:f(f(f(x)))
+    '''
+
+    def fF(f):
+        def xF(x):
+            return f(n(f)(x))
+        return xF
+    return fF
+
+
+def one(f):
+    """Church numeral 1: same as successor(zero)"""
+    "*** YOUR CODE HERE ***"
+    return lambda x: f(x)
+
+
+def two(f):
+    """Church numeral 2: same as successor(successor(zero))"""
+    "*** YOUR CODE HERE ***"
+    return lambda x: f(f(x))
+
+three = successor(two)
+
+
+def church_to_int(n):
+    """Convert the Church numeral n to a Python integer.
+
+    >>> church_to_int(zero)
+    0
+    >>> church_to_int(one)
+    1
+    >>> church_to_int(two)
+    2
+    >>> church_to_int(three)
+    3
+    """
+    "*** YOUR CODE HERE ***"
+
+    '''
+    最开始想通过类似函数内省的方法判断基层嵌套，但Python的函数式运行时解释运行，所以内省没法办拿到递归定义的结构
+    one和two的定义很关键，反复思考确定one/two后，开始想能否构造一个function f, 及参数x, 通过函数调用的方式, 
+    使得:
+    zero(f)(x) = 0
+    one(f)(x) = 1
+    two(f)(x) = 2
+
+    从zero(f)(x) -> x:x = 0, 很自然想到取x=0
+    从one(f)(x) -> f(x), two(f)(x) -> f(f(x)), 想到lambda x: x+1 作为f
+    '''
+
+    return n(lambda x:x+1)(0)
+
+
+def add_church(m, n):
+    """Return the Church numeral for m + n, for Church numerals m and n.
+
+    >>> church_to_int(add_church(two, three))
+    5
+    """
+    "*** YOUR CODE HERE ***"
+
+    '''
+    add_church的返回值不是一个值，而是一个函数，想办法构造一个类似merge的函数，用一等函数的方式思考，
+    add_church不一定非要返回一个真的two+three=five, 而是构造一个计算过程，在church_to_int中求值为5就可以
+    考虑计算过程的组合方式
+
+    函数求值方式没考虑特别清楚，第二天思考了下，发现：
+    1.需要先计算n(f)(x)
+    2.之后把n(f)(x)作为参数传给m(f), 即m(f)(n(f)(x))
+    '''
+
+    return lambda f: lambda x: m(f)(n(f)(x))
+
+
+def mul_church(m, n):
+    """Return the Church numeral for m * n, for Church numerals m and n.
+
+    >>> four = successor(three)
+    >>> church_to_int(mul_church(two, three))
+    6
+    >>> church_to_int(mul_church(three, four))
+    12
+    """
+    "*** YOUR CODE HERE ***"
+
+    # 在构造add时，又先构造出pow来，有些理解但还不到位，误打误撞
+    return lambda f: m(n(f))
+
+
+def pow_church(m, n):
+    """Return the Church numeral m ** n, for Church numerals m and n.
+
+    >>> church_to_int(pow_church(two, three))
+    8
+    >>> church_to_int(pow_church(three, two))
+    9
+    """
+    "*** YOUR CODE HERE ***"
+
+    # 在构造add时，第一个无意构造出pow来，哈哈
+    return lambda f: n(m)(f)
