@@ -1,4 +1,15 @@
 ## hw02
+##### How to run
+Run with
+```
+python3 ok
+```
+or 
+```
+python3 ok -v
+```
+For detail check [using-ok](https://inst.eecs.berkeley.edu/~cs61a/fa21/articles/using-ok/)
+
 这一节的作业很有启发性
 https://inst.eecs.berkeley.edu/~cs61a/fa21/hw/hw02/
 

@@ -33,7 +33,6 @@ def product(n, term):
     >>> product(3, triple)    # 1*3 * 2*3 * 3*3
     162
     """
-    "*** YOUR CODE HERE ***"
 
     product = 1
     for i in range(1, n+1):
@@ -69,7 +68,6 @@ def accumulate(merger, base, n, term):
     >>> accumulate(lambda x, y: (x + y) % 17, 19, 20, square)
     16
     """
-    "*** YOUR CODE HERE ***"
 
     '''
     将复杂的计算过程抽象成高阶函数组合，每一个小函数的工作都比较简单，但通过组合，构建出复杂的过程
@@ -92,7 +90,7 @@ def summation_using_accumulate(n, term):
     >>> summation_using_accumulate(5, triple)
     45
     """
-    "*** YOUR CODE HERE ***"
+
     return accumulate(lambda x, y: x + y, 0, n, term)
 
 
@@ -104,7 +102,7 @@ def product_using_accumulate(n, term):
     >>> product_using_accumulate(6, triple)
     524880
     """
-    "*** YOUR CODE HERE ***"
+
     return accumulate(lambda x, y: x * y, 1, n, term)
 
 
@@ -153,13 +151,11 @@ def successor_expend(n):
 
 def one(f):
     """Church numeral 1: same as successor(zero)"""
-    "*** YOUR CODE HERE ***"
     return lambda x: f(x)
 
 
 def two(f):
     """Church numeral 2: same as successor(successor(zero))"""
-    "*** YOUR CODE HERE ***"
     return lambda x: f(f(x))
 
 three = successor(two)
@@ -177,7 +173,6 @@ def church_to_int(n):
     >>> church_to_int(three)
     3
     """
-    "*** YOUR CODE HERE ***"
 
     '''
     最开始想通过类似函数内省的方法判断基层嵌套，但Python的函数式运行时解释运行，所以内省没法办拿到递归定义的结构
@@ -200,7 +195,6 @@ def add_church(m, n):
     >>> church_to_int(add_church(two, three))
     5
     """
-    "*** YOUR CODE HERE ***"
 
     '''
     add_church的返回值不是一个值，而是一个函数，想办法构造一个类似merge的函数，用一等函数的方式思考，
@@ -224,7 +218,6 @@ def mul_church(m, n):
     >>> church_to_int(mul_church(three, four))
     12
     """
-    "*** YOUR CODE HERE ***"
 
     return lambda f: m(n(f))
 
@@ -237,6 +230,5 @@ def pow_church(m, n):
     >>> church_to_int(pow_church(three, two))
     9
     """
-    "*** YOUR CODE HERE ***"
 
     return lambda f: n(m)(f)  # return n(m)
