@@ -70,6 +70,13 @@ def accumulate(merger, base, n, term):
     16
     """
     "*** YOUR CODE HERE ***"
+
+    '''
+    将复杂的计算过程抽象成高阶函数组合，每一个小函数的工作都比较简单，但通过组合，构建出复杂的过程
+    比如:
+    1. merge 一般是将两个item做merge得到一个item, 有点类似reduce操作. merge的行为可以封装在函数中传递
+    2. 得到item的过程也可封装在函数中传递
+    '''
     
     accu = base
     for i in range(1, n + 1):
@@ -200,7 +207,7 @@ def add_church(m, n):
     add_church不一定非要返回一个真的two+three=five, 而是构造一个计算过程，在church_to_int中求值为5就可以
     考虑计算过程的组合方式
 
-    函数求值方式没考虑特别清楚，第二天思考了下，发现：
+    函数求值方式没考虑特别清楚，第二天思考了下，发现:
     1.需要先计算n(f)(x)
     2.之后把n(f)(x)作为参数传给m(f), 即m(f)(n(f)(x))
     '''
@@ -219,7 +226,6 @@ def mul_church(m, n):
     """
     "*** YOUR CODE HERE ***"
 
-    # 在构造add时，又先构造出pow来，有些理解但还不到位，误打误撞
     return lambda f: m(n(f))
 
 
@@ -233,5 +239,4 @@ def pow_church(m, n):
     """
     "*** YOUR CODE HERE ***"
 
-    # 在构造add时，第一个无意构造出pow来，哈哈
-    return lambda f: n(m)(f)
+    return lambda f: n(m)(f)  # return n(m)
