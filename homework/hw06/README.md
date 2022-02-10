@@ -18,3 +18,12 @@ def build_link(n_str):
     
 return build_link(str(n))
 ```
+
+### Q6: Next Virahanka Fibonacci Object
+根据Hint
+```
+Hint: Keep track of the previous number by setting a new instance attribute inside next. You can create new instance attributes for objects at any point, even outside the __init__ method.
+```
+我们可以在next方法中给instance动态加attribute，添加一个self.previous即可。
+这是动态语言的特性，根据我的code review经验，这也是Java等静态语言支持者所不提倡的做法，即动态给class/instance添加method或attribute，会使代码看起来confuse
+我还是倾向于在定义class instance时把previous定义好

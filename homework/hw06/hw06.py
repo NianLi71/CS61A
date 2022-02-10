@@ -142,23 +142,6 @@ class Nickel(Coin):
 class Dime(Coin):
     cents = 10
 
-
-# copy from reading section 2.9
-# class Link:
-#         """A linked list with a first element and the rest."""
-#         empty = ()
-#         def __init__(self, first, rest=empty):
-#             assert rest is Link.empty or isinstance(rest, Link)
-#             self.first = first
-#             self.rest = rest
-#         def __getitem__(self, i):
-#             if i == 0:
-#                 return self.first
-#             else:
-#                 return self.rest[i-1]
-#         def __len__(self):
-#             return 1 + len(self.rest)
-
 def store_digits(n):
     """Stores the digits of a positive number n in a linked list.
 
@@ -211,7 +194,18 @@ def deep_map_mut(fn, link):
     >>> print(link1)
     <9 <16> 25 36>
     """
-    "*** YOUR CODE HERE ***"
+    
+    if link == Link.empty:
+        return
+
+    if isinstance(link.first, int):
+        link.first = fn(link.first)
+        deep_map_mut(fn, link.rest)
+    elif isinstance(link.first, Link):
+        deep_map_mut(fn, link.first)
+        deep_map_mut(fn, link.rest)
+    else:
+        raise Exception(f'Unknow type for link.first: {link.first}')
 
 
 def two_list(vals, amounts):
@@ -233,7 +227,21 @@ def two_list(vals, amounts):
     >>> c
     Link(1, Link(1, Link(3, Link(3, Link(2)))))
     """
-    "*** YOUR CODE HERE ***"
+    
+    a, b = vals, amounts
+    head = Link.empty
+    last = Link.empty
+    for b_i, times in enumerate(b):
+        for repeat in range(times):
+            if head == Link.empty:
+                head = Link(a[b_i])
+                last = head
+            else:
+                last.rest = Link(a[b_i])
+                last = last.rest
+
+    return head 
+
 
 
 class VirFib():
@@ -262,7 +270,15 @@ class VirFib():
         self.value = value
 
     def next(self):
-        "*** YOUR CODE HERE ***"
+        if self.value == 0:
+            self.previous = 0 
+            next_virfib = VirFib(1)
+            next_virfib.previous = 0
+            return next_virfib  # second element
+        
+        next_virfib = VirFib(self.previous + self.value)
+        next_virfib.previous = self.value
+        return next_virfib
 
     def __repr__(self):
         return "VirFib object, value " + str(self.value)
@@ -293,7 +309,7 @@ def is_bst(t):
     >>> is_bst(t7)
     False
     """
-    "*** YOUR CODE HERE ***"
+
 
 
 class Link:
