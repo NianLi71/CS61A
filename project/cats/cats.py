@@ -107,8 +107,27 @@ def accuracy(typed, reference):
     typed_words = split(typed)
     reference_words = split(reference)
     # BEGIN PROBLEM 3
+
+    def is_empty(words):
+        return not words
+
+    if is_empty(typed_words):
+        if is_empty(reference_words):
+            return 100.0
+        else:
+            return 0.0
+    else:
+        if is_empty(reference_words):
+            return 0.0
     
+    matched_count = 0
+    index_limit = min(len(typed_words), len(reference_words))
+    for i in range(index_limit):
+        if typed_words[i] == reference_words[i]:
+            matched_count += 1
     
+    # typed_words 长度作为分母，只比较当前typed words的准确性
+    return matched_count / float(len(typed_words)) * 100.0
 
     # END PROBLEM 3
 
@@ -127,7 +146,9 @@ def wpm(typed, elapsed):
     """
     assert elapsed > 0, 'Elapsed time must be positive'
     # BEGIN PROBLEM 4
-    "*** YOUR CODE HERE ***"
+    
+    return len(typed) / 5.0 * 60.0 / elapsed
+
     # END PROBLEM 4
 
 
@@ -389,6 +410,7 @@ def run_typing_test(topics):
         print()
 
         elapsed = (datetime.now() - start).total_seconds()
+        print(f'elaspsed: {elapsed}')
         print("Nice work!")
         print('Words per minute:', wpm(typed, elapsed))
         print('Accuracy:        ', accuracy(typed, reference))
