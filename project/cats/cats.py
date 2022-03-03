@@ -175,7 +175,16 @@ def autocorrect(typed_word, valid_words, diff_function, limit):
     'testing'
     """
     # BEGIN PROBLEM 5
-    "*** YOUR CODE HERE ***"
+
+    if typed_word in valid_words:
+        return typed_word
+
+    cloest_word = min(valid_words, key=lambda w: diff_function(typed_word, w, limit))
+    if diff_function(typed_word, cloest_word, limit) > limit:
+        return typed_word
+    else:
+        return cloest_word
+
     # END PROBLEM 5
 
 
@@ -200,15 +209,37 @@ def feline_flips(start, goal, limit):
     5
     >>> feline_flips("rose", "hello", big_limit)   # Substitute: r->h, o->e, s->l, e->l, length difference of 1.
     5
+
+    note that:
+    feline_flips('silly', 'silly', 0) should be 0
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+
+    if not start and not goal: # both to the end
+        return 0
+
+    if not start or not goal: # run out of one words
+        return abs(len(start) - len(goal))
+
+    if limit < 0: # greater than limit
+        return 1
+
+    if start[0] != goal[0]:
+        return 1 + feline_flips(start[1:], goal[1:], limit - 1)
+    else:
+        return feline_flips(start[1:], goal[1:], limit)
+
     # END PROBLEM 6
 
 
 def minimum_mewtations(start, goal, limit):
     """A diff function that computes the edit distance from START to GOAL.
     This function takes in a string START, a string GOAL, and a number LIMIT.
+    这一题不就是编辑距离吗, 其实按照单词长度来说, 搜索范围也不大, 完全可以暴力搜索实现.
+    之前在面试中遇到过, 太想用动态规划去解, 把问题想复杂了.
+    1.先确定问题规模是单词级别
+    2.实现搜索版本
+    3.DP版本
 
     Arguments:
         start: a starting word
@@ -223,31 +254,34 @@ def minimum_mewtations(start, goal, limit):
     >>> minimum_mewtations("ckiteus", "kittens", big_limit) # ckiteus -> kiteus -> kitteus -> kittens
     3
     """
-    assert False, 'Remove this line'
 
-    if ______________:  # Fill in the condition
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+    if limit < 0:
+        return 1
 
-    elif ___________:  # Feel free to remove or add additional cases
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+    elif not start and not goal: # both to the end
+        return 0
+
+    elif not start or not goal:  # one is empty string
+        return max(len(start), len(goal))
+
+    elif start[0] == goal[0]:
+        return minimum_mewtations(start[1:], goal[1:], limit)
 
     else:
-        add = ...  # Fill in these lines
-        remove = ...
-        substitute = ...
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+        add = goal[0] + start
+        remove = start[1:]
+        substitute = goal[0] + start[1:]
+        return min(minimum_mewtations(add, goal, limit - 1), 
+                    minimum_mewtations(remove, goal, limit - 1),
+                    minimum_mewtations(substitute, goal, limit - 1)) + 1
 
 
 def final_diff(start, goal, limit):
     """A diff function that takes in a string START, a string GOAL, and a number LIMIT.
     If you implement this function, it will be used."""
-    assert False, 'Remove this line to use your final_diff function.'
+    
+    # return feline_flips(start, goal, limit)
+    return minimum_mewtations(start, goal, limit)
 
 
 FINAL_DIFF_LIMIT = 6  # REPLACE THIS WITH YOUR LIMIT

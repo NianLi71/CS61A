@@ -2,6 +2,7 @@ import cats
 import pickle
 import time
 import random
+from pprint import pprint
 
 if __name__ == '__main__':
     pickled_file = "data/testcases.out"
@@ -16,6 +17,7 @@ if __name__ == '__main__':
     start_time = time.time()
 
     correct_words = list(test_dict.keys())
+    pprint(test_dict)
     random.shuffle(correct_words)
     correctly_corrected, incorrectly_corrected, not_corrected, trial_counter = 0, 0, 0, 0
     for correct in correct_words:
