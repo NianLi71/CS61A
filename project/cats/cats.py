@@ -316,7 +316,20 @@ def report_progress(sofar, prompt, user_id, upload):
     0.2
     """
     # BEGIN PROBLEM 8
-    "*** YOUR CODE HERE ***"
+
+    correct_cnt = 0
+    limit = min(len(sofar), len(prompt))
+    for i in range(limit):
+        if sofar[i] == prompt[i]:
+            correct_cnt += 1
+        else:
+            break
+    progress = float(correct_cnt) / len(prompt)
+
+    upload({'id': user_id, 'progress': progress})
+
+    return progress
+
     # END PROBLEM 8
 
 
@@ -338,7 +351,16 @@ def time_per_word(words, times_per_player):
     [[6, 3, 6, 2], [10, 6, 1, 2]]
     """
     # BEGIN PROBLEM 9
-    "*** YOUR CODE HERE ***"
+
+    time_costs = []
+    for t in times_per_player:
+        time_per_one_player = []
+        for i in range(len(t) - 1):
+            time_per_one_player.append(t[i+1] - t[i])
+        time_costs.append(time_per_one_player)
+
+    return match(words, time_costs)
+
     # END PROBLEM 9
 
 
@@ -360,7 +382,17 @@ def fastest_words(match):
     player_indices = range(len(get_times(match)))  # contains an *index* for each player
     word_indices = range(len(get_words(match)))    # contains an *index* for each word
     # BEGIN PROBLEM 10
-    "*** YOUR CODE HERE ***"
+    
+    fastest_list = [ list() for i in player_indices]
+    for w_i in word_indices:
+        min_index = 0
+        for p_i in player_indices:
+            if time(match, p_i, w_i) < time(match, min_index, w_i):
+                min_index = p_i
+        fastest_list[min_index].append(word_at(match, w_i))
+
+    return fastest_list
+
     # END PROBLEM 10
 
 
@@ -412,7 +444,7 @@ def match_string(match):
     return "match(%s, %s)" % (match[0], match[1])
 
 
-enable_multiplayer = False  # Change to True when you're ready to race.
+enable_multiplayer = True  # Change to True when you're ready to race.
 
 ##########################
 # Command Line Interface #
